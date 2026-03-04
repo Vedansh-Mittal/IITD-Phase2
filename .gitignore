@@ -1,8 +1,26 @@
+# Data folders
 data/
 outputs/
+
+# Large parquet files
 *.parquet
-*.csv
-.DS_Store
-__pycache__/
-.ipynb_checkpoints/
+
+# Python environment
 venv/
+.env
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Mac files
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Models
+*.pkl
+
+# Logs
+*.log
