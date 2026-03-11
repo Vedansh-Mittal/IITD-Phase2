@@ -24,3 +24,7 @@ __pycache__/
 
 # Logs
 *.log
+
+# Submission files
+submission_final2.csv
+submission_day7.csv
