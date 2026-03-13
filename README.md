@@ -78,8 +78,8 @@ IITD-Phase2/
 │   ├── Day4_modelling.ipynb           # Model training & ensemble
 │   ├── Day5_RedHerring_Analysis.ipynb # Red herring detection
 │   ├── Day6_Temporal_window_detection.ipynb  # Suspicious window estimation (EDA)
-│   ├── day7_temporal.py               # Advanced temporal window anchored to last txn
-│   ├── day7_rh7.py                    # Adaptive thresholding for frozen red herrings
+│   ├── day7_temporal_fix.py           # Temporal window adjustments to fix IOU score
+│   ├── day7_rh7_fix.py                # Red herring 7 probability fix (attempted but unsuccessful)
 │   └── final_model_clean.pkl          # Serialized final model
 │
 ├── outputs/                           # Intermediate & final outputs (gitignored)
@@ -101,7 +101,7 @@ IITD-Phase2/
 │   ├── oof_*.npy                      # Out-of-fold predictions
 │   └── test_preds_*.npy               # Test set predictions
 │
-├── notebooks/submission_final_day7.csv # Final submission file (64K predictions)
+├── notebooks/final_submission.csv     # Final submission file (64K predictions)
 ├── requirements.txt                   # Python dependencies
 └── .gitignore
 ```
@@ -165,7 +165,7 @@ graph LR
     D --> E[Day 5<br/>Red Herring]
     E --> F[Day 6<br/>Temporal Windows]
     F --> H[Day 7<br/>RH7 Post-Proc]
-    H --> G[submission_final_day7.csv]
+    H --> G[final_submission.csv]
 ```
 
 ---
@@ -307,11 +307,11 @@ Features flagged as potential red herrings include demographics-based features l
 
 These were either downweighted or excluded from the final model to avoid overfitting to noise.
 
-### RH7 Post-Processing Fix (`day7_rh7.py`)
+### RH7 Post-Processing Fix (`day7_rh7_fix.py`)
 
 A critical red herring was discovered involving the `is_frozen` status. The model heavily weighted frozen accounts as mules since it is a massive predictor. However, legitimate accounts can also be frozen for unrelated reasons (e.g., KYC issues).
 
-**The Fix**: A post-processing rule identifies "RH7 Candidates"—accounts with borderline probabilities (0.05–0.50) that are frozen but have **strictly zero counterparty overlap** with the known mule network. The probability for these red herrings is heavily dampened (scaled by 0.05) to eliminate false positives without affecting high-confidence mules.
+**The Fix**: A post-processing rule identifies "RH7 Candidates"—accounts with borderline probabilities (0.05–0.50) that are frozen but have **strictly zero counterparty overlap** with the known mule network. The probability for these red herrings is heavily dampened (scaled by 0.05) to eliminate false positives without affecting high-confidence mules. *Note: While theoretically sound, this fix ultimately did not improve the final baseline score.*
 
 ---
 
@@ -323,9 +323,10 @@ A critical red herring was discovered involving the `is_frozen` status. The mode
 
 1. **Identify High-Risk Accounts** — Select accounts with `is_mule` probability above a threshold
 2. **Extract Transaction History** — Pull full transaction records for high-risk accounts
-3. **Anomaly Window Detection (v4 Approach in `day7_temporal.py`)** — 
+3. **Anomaly Window Detection (v4 Approach in `day7_temporal_fix.py`)** — 
    - **Learn True Window Shape**: Instead of just finding the densest historical window, the script learns the true window distribution from training mules by analyzing the lag between their `first_txn`, `last_txn`, and `mule_flag_date`.
    - **Anchor to Recent Activity**: For test mules, it anchors the window end near the `last_txn` date and extends backward using the 75th percentile lookback period derived from the training set.
+   - **Performance Improvement**: This temporal fix successfully targets and improves the Temporal IoU score.
 4. **Output** — ISO timestamps for the estimated suspicious activity window assigned efficiently based on this learned temporal offset.
 
 The temporal window accuracy is scored using **Temporal IoU** (Intersection over Union) against ground truth.
@@ -334,7 +335,7 @@ The temporal window accuracy is scored using **Temporal IoU** (Intersection over
 
 ## 📈 Results & Submission
 
-The final submission (`submission_final_day7.csv`) contains **64,062 predictions**:
+The final submission (`final_submission.csv`) contains **64,062 predictions**:
 
 ```csv
 account_id,is_mule,suspicious_start,suspicious_end
@@ -389,8 +390,8 @@ jupyter notebook
 | 4 | `Day4_modelling.ipynb` | Model training, ensemble, and calibration | ~15-30 min |
 | 5 | `Day5_RedHerring_Analysis.ipynb` | Red herring detection and feature cleaning | ~5 min |
 | 6 | `Day6_Temporal_window_detection.ipynb` | Suspicious window EDA and analysis | ~20-40 min |
-| 7 | `day7_temporal.py` | Assign advanced temporal windows using learned offsets | ~5 min |
-| 8 | `day7_rh7.py` | Apply RH7 dampening rules for frozen accounts | ~2 min |
+| 7 | `day7_temporal_fix.py` | Assign advanced temporal windows (fixes Temporal IoU score) | ~5 min |
+| 8 | `day7_rh7_fix.py` | Apply RH7 dampening rules (attempted fix to improve score, but ultimately didn't) | ~2 min |
 
 > **Note**: Steps 2 and 3 involve scanning ~400M transactions and can be memory-intensive. A machine with **16+ GB RAM** is recommended.
 
