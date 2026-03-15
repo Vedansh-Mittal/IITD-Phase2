@@ -30,3 +30,5 @@ outputs/*
 
 # Submission files
 *.csv
+
+notebooks/final_model_clean.pkl
