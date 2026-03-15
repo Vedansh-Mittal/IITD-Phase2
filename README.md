@@ -298,6 +298,11 @@ Root-cause analysis identified 95 test accounts that are frozen with exactly zer
 
 The final submission contains **64,062 predictions** with 1,276 accounts flagged as mules (threshold 0.40, 2.0% alert rate).
 
+> **On label-adjacent features:** Confirmed with organizers (March 14) that
+> mule_flag_date, alert_reason, freeze_date, and label-derived branch features
+> are not valid model inputs. All such fields were identified and excluded.
+> Shuffle-label verification: OOF AUC with permuted labels = 0.508 (chance level).
+
 ---
 
 ## 🚀 Getting Started
