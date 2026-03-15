@@ -21,6 +21,10 @@ __pycache__/
 
 # Models
 *.pkl
+!outputs/model_lgb_final.pkl
+!outputs/model_xgb_final.pkl
+!outputs/calibrator_final.pkl
+!outputs/feature_cols.pkl
 
 # Logs
 *.log
