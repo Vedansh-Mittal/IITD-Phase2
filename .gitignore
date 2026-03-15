@@ -1,6 +1,5 @@
 # Data folders
 data/
-outputs/
 
 # Large parquet files
 *.parquet
@@ -30,6 +29,4 @@ outputs/*
 *.log
 
 # Submission files
-submission_final2.csv
-submission_day7.csv
-submission_final_day7.csv
+*.csv
