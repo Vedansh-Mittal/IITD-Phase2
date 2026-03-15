@@ -130,7 +130,7 @@ IITD-Phase2/
 │   ├── calibrator_final.pkl           # Isotonic regression calibrator
 │   └── final_submission.csv           # 64,062 predictions (final)
 │
-├── SYN_ACK_Phase2_Report.pdf          # Full technical report (30 pages)
+├── src/                               # Source code
 ├── requirements.txt
 └── .gitignore
 ```
